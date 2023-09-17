@@ -1,8 +1,8 @@
 package com.donovanwilder.android.bloodpressurehq.ui
 
+import android.provider.Settings.Global
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -16,17 +16,27 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.donovanwilder.android.bloodpressurehq.R
 import com.donovanwilder.android.bloodpressurehq.data.BpRecord
 import com.donovanwilder.android.bloodpressurehq.tools.DateTools
 import com.github.mikephil.charting.charts.LineChart
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.stateIn
 import java.util.Date
 
 
@@ -40,8 +50,8 @@ fun BloodPressureHqApp() {
 @Composable
 fun ScreenLayout() {
     Column {
-        StatisticsDisplay(Modifier.weight(1f))
-        RecordsDisplay(Modifier.weight(1f))
+        StatisticsDisplay(modifier = Modifier.weight(1f))
+        RecordsDisplay(modifier = Modifier.weight(1f))
     }
 }
 
@@ -82,13 +92,15 @@ fun StatisticsDisplay(modifier: Modifier = Modifier) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecordsDisplay(modifier: Modifier = Modifier) {
+fun RecordsDisplay(bpRecordsViewModel: BpRecordsViewModel = viewModel(),modifier: Modifier = Modifier) {
+
+    var recordList by remember{ mutableStateOf(bpRecordsViewModel.bpRecordList) }
     Scaffold(modifier = modifier, topBar = {
         CenterAlignedTopAppBar(title = { Text(text = "Records") })
     }) {
         LazyColumn( contentPadding = it, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            items(listOf(1, 5, 2, 3, 74, 5, 8, 7, 8, 63, 5, 4, 85)) {
-                RecordItem(BpRecord(dateAdded = Date(), sys = 120, dia=73, pulse = 60), modifier = modifier.padding(16.dp))
+            items(recordList) {
+                RecordItem(it, modifier = modifier.padding(16.dp))
             }
         }
 
@@ -101,7 +113,9 @@ fun RecordItem(record:BpRecord, modifier: Modifier = Modifier) {
         modifier = Modifier
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(8.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
             Column {

@@ -54,6 +54,12 @@ android {
 }
 
 dependencies {
+    //Viewmodels
+    val lifecycleVersion = " 2.5.1"
+
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleVersion")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion")
+    
     //Room
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
     implementation ("androidx.activity:activity-ktx:1.7.2")
