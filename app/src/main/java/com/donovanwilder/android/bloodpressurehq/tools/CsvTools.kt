@@ -1,6 +1,6 @@
 package com.donovanwilder.android.bloodpressurehq.tools
 
-import com.donovanwilder.android.bloodpressurehq.data.BpRecord
+import com.donovanwilder.android.bloodpressurehq.model.BpRecord
 import java.io.File
 import java.util.*
 

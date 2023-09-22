@@ -1,4 +1,4 @@
-package com.donovanwilder.android.bloodpressurehq.data
+package com.donovanwilder.android.bloodpressurehq.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
-import com.donovanwilder.android.bloodpressurehq.data.BpRecord
+import com.donovanwilder.android.bloodpressurehq.model.BpRecord
 import kotlinx.coroutines.flow.Flow
 import java.util.Date
 

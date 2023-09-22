@@ -3,7 +3,7 @@ package com.donovanwilder.android.bloodpressurehq.database
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.donovanwilder.android.bloodpressurehq.data.BpRecord
+import com.donovanwilder.android.bloodpressurehq.model.BpRecord
 
 @Database([BpRecord::class], version = 2)
 @TypeConverters(BpRecordTypeConverters::class)
