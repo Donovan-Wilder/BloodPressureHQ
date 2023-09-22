@@ -15,6 +15,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -29,7 +30,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.donovanwilder.android.bloodpressurehq.model.BpRecord
 import com.donovanwilder.android.bloodpressurehq.tools.DateTools
-import java.sql.Time
 import java.util.Calendar
 import java.util.Date
 import java.util.GregorianCalendar
@@ -46,7 +46,34 @@ fun UpdateRecordDialogPreview() {
     UpdateRecordDialog(
         bpRecord = BpRecord(0, Date(), 120, 70, 60),
         onUpdateButtonClicked = {},
-        onCancelButtonClicked = {})
+        onCancelButtonClicked = {},
+        onDeleteButtonClicked = {})
+}
+
+@Preview
+@Composable
+fun ConfirmationDialogPreview() {
+    ConfirmationDialog(onConfirmation = {}, onNegation = {})
+}
+
+@Composable
+fun ConfirmationDialog(modifier: Modifier = Modifier, onConfirmation: ()->Unit,onNegation:() ->Unit) {
+
+        Card {
+            Column (Modifier.padding(16.dp)){
+                Text(text = "Are you sure you want to delete this record?")
+                Spacer(Modifier.height(16.dp))
+                Row {
+                    Button(onClick = onConfirmation) {
+                        Text(text = "Yes")
+                    }
+                    Spacer(Modifier.width(16.dp))
+                    Button(onClick = onNegation) {
+                        Text(text = "No")
+                    }
+                }
+            }
+        }
 }
 
 @Composable
@@ -60,7 +87,8 @@ fun AddRecordDialog(
         title = "New Record",
         actionButtonTitle = "Add",
         onActionButtonClicked = onAddButtonClicked,
-        onCancelButtonClicked = onCancelButtonClicked
+        onCancelButtonClicked = onCancelButtonClicked,
+        onDeleteButtonClicked = {}
     )
 }
 
@@ -69,7 +97,8 @@ fun UpdateRecordDialog(
     modifier: Modifier = Modifier,
     bpRecord: BpRecord,
     onUpdateButtonClicked: (updatedBpRecord: BpRecord) -> Unit,
-    onCancelButtonClicked: () -> Unit
+    onCancelButtonClicked: () -> Unit,
+    onDeleteButtonClicked: () -> Unit
 ) {
     ChangeRecordDialog(
         modifier = modifier,
@@ -78,7 +107,8 @@ fun UpdateRecordDialog(
         canChangeDate = true,
         actionButtonTitle = "Update",
         onActionButtonClicked = onUpdateButtonClicked,
-        onCancelButtonClicked = onCancelButtonClicked
+        onCancelButtonClicked = onCancelButtonClicked,
+        onDeleteButtonClicked = onDeleteButtonClicked
     )
 }
 
@@ -92,7 +122,8 @@ fun ChangeRecordDialog(
     actionButtonTitle: String,
     canChangeDate: Boolean = false,
     onActionButtonClicked: (updatedBpRecord: BpRecord) -> Unit,
-    onCancelButtonClicked: () -> Unit
+    onCancelButtonClicked: () -> Unit,
+    onDeleteButtonClicked: () -> Unit
 ) {
     val calendar = GregorianCalendar.getInstance()
     calendar.time = bpRecord.dateAdded
@@ -200,6 +231,14 @@ fun ChangeRecordDialog(
                 Spacer(modifier = Modifier.width(16.dp))
                 Button(onClick = onCancelButtonClicked) {
                     Text(text = "Cancel")
+                }
+                if (canChangeDate) {
+                    Spacer(modifier = Modifier.width(16.dp))
+                    TextButton(onClick =
+                        onDeleteButtonClicked
+                    ) {
+                        Text(text = "Delete")
+                    }
                 }
 
             }

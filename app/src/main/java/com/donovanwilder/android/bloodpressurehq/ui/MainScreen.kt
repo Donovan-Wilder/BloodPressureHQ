@@ -1,11 +1,5 @@
 package com.donovanwilder.android.bloodpressurehq.ui
 
-import androidx.compose.animation.core.updateTransition
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.interaction.Interaction
-import androidx.compose.foundation.interaction.InteractionSource
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,9 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -70,7 +62,7 @@ fun MainScreen(viewModel: BpRecordsViewModel = viewModel()) {
 
                 StatisticsScreen(modifier = Modifier.weight(1f))
                 RecordsScreen(updateRecord = {
-                    updateBpRecord= it
+                    updateBpRecord = it
                     dialogState = CurrentDialog.Update_Record
                 }, modifier = Modifier.weight(1f))
             }
@@ -91,16 +83,39 @@ fun MainScreen(viewModel: BpRecordsViewModel = viewModel()) {
                 }
 
                 CurrentDialog.Update_Record -> {
-                    Dialog(onDismissRequest = { CurrentDialog.None },
+                    Dialog(onDismissRequest = { dialogState = CurrentDialog.None },
                         properties = DialogProperties(true, true),
                         content = {
                             UpdateRecordDialog(
                                 bpRecord = updateBpRecord!!,
                                 onUpdateButtonClicked = {
                                     viewModel.updateRecord(it)
-                                    dialogState= CurrentDialog.None},
-                                onCancelButtonClicked = {dialogState= CurrentDialog.None})
+                                    dialogState = CurrentDialog.None
+                                },
+                                onCancelButtonClicked = { dialogState = CurrentDialog.None },
+                                onDeleteButtonClicked = {
+                                    dialogState = CurrentDialog.Delete_Record
+                                })
                         })
+
+                }
+
+                CurrentDialog.Delete_Record -> {
+                    Dialog(
+                        onDismissRequest = { dialogState = CurrentDialog.Update_Record },
+                        properties = DialogProperties(false, false),
+                    ) {
+                        ConfirmationDialog(
+                            onConfirmation = {
+                                viewModel.deleteRecord(updateBpRecord!!)
+                                dialogState = CurrentDialog.None
+
+                            },
+                            onNegation = {
+                                dialogState = CurrentDialog.Update_Record
+                            }
+                        )
+                    }
                 }
 
                 else -> {}
@@ -215,8 +230,9 @@ fun RecordItem(record: BpRecord, onClick: () -> Unit, modifier: Modifier = Modif
     }
 }
 
-enum class CurrentDialog(var bpRecord: BpRecord? = null) {
+enum class CurrentDialog() {
     None,
     Add_Record,
-    Update_Record
+    Update_Record,
+    Delete_Record,
 }
