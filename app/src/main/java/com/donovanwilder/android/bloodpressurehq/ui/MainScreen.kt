@@ -1,5 +1,11 @@
 package com.donovanwilder.android.bloodpressurehq.ui
 
+import androidx.compose.animation.core.updateTransition
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.InteractionSource
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -47,12 +54,13 @@ fun BloodPressureHqApp() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(viewModel: BpRecordsViewModel = viewModel()) {
-    var dialogState by rememberSaveable { mutableStateOf(false) }
+    var dialogState by rememberSaveable { mutableStateOf(CurrentDialog.None) }
+    var updateBpRecord: BpRecord? = null
     Scaffold(
         topBar = { CenterAlignedTopAppBar(title = { Text("BloodPressure HQ") }) },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { dialogState = true },
+                onClick = { dialogState = CurrentDialog.Add_Record },
                 content = {})
         }
     ) {
@@ -61,26 +69,47 @@ fun MainScreen(viewModel: BpRecordsViewModel = viewModel()) {
             Column(modifier = Modifier.padding(it)) {
 
                 StatisticsScreen(modifier = Modifier.weight(1f))
-                RecordsScreen(modifier = Modifier.weight(1f))
+                RecordsScreen(updateRecord = {
+                    updateBpRecord= it
+                    dialogState = CurrentDialog.Update_Record
+                }, modifier = Modifier.weight(1f))
             }
-            if (dialogState == true) {
-                Dialog(
-                    onDismissRequest = { dialogState = false },
-                    properties = DialogProperties(true, true),
-                    content = {
-                        NewRecordDialog(
-                            onAddButttonClicked = {
-                                viewModel.addRecords(it)
-                                dialogState = false
-                            },
-                            onCancelButtonClicked = { dialogState = false })
-                    }
-                )
-            }
+            when (dialogState) {
+                CurrentDialog.Add_Record -> {
+                    Dialog(
+                        onDismissRequest = { dialogState = CurrentDialog.None },
+                        properties = DialogProperties(true, true),
+                        content = {
+                            AddRecordDialog(
+                                onAddButtonClicked = {
+                                    viewModel.addRecords(it)
+                                    dialogState = CurrentDialog.None
+                                },
+                                onCancelButtonClicked = { dialogState = CurrentDialog.None })
+                        }
+                    )
+                }
 
+                CurrentDialog.Update_Record -> {
+                    Dialog(onDismissRequest = { CurrentDialog.None },
+                        properties = DialogProperties(true, true),
+                        content = {
+                            UpdateRecordDialog(
+                                bpRecord = updateBpRecord!!,
+                                onUpdateButtonClicked = {
+                                    viewModel.updateRecord(it)
+                                    dialogState= CurrentDialog.None},
+                                onCancelButtonClicked = {dialogState= CurrentDialog.None})
+                        })
+                }
+
+                else -> {}
+            }
         }
     }
+
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -121,9 +150,11 @@ fun StatisticsScreen(modifier: Modifier = Modifier) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecordsScreen(
+    modifier: Modifier = Modifier,
+    updateRecord: (bpRecord: BpRecord) -> Unit,
     bpRecordsViewModel: BpRecordsViewModel = viewModel(),
-    modifier: Modifier = Modifier
-) {
+
+    ) {
 
 
     val recordList by bpRecordsViewModel.bpRecordsList.collectAsState()
@@ -138,7 +169,10 @@ fun RecordsScreen(
     ) {
         LazyColumn(contentPadding = it, verticalArrangement = Arrangement.spacedBy(8.dp)) {
             items(recordList) {
-                RecordItem(it, modifier = modifier.padding(16.dp))
+                RecordItem(
+                    it,
+                    onClick = { updateRecord(it) }
+                )
             }
         }
 
@@ -146,10 +180,12 @@ fun RecordsScreen(
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecordItem(record: BpRecord, modifier: Modifier = Modifier) {
+fun RecordItem(record: BpRecord, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Card(
-        modifier = Modifier
+        modifier = Modifier,
+        onClick = onClick
     ) {
         Row(
             modifier = Modifier
@@ -177,4 +213,10 @@ fun RecordItem(record: BpRecord, modifier: Modifier = Modifier) {
             }
         }
     }
+}
+
+enum class CurrentDialog(var bpRecord: BpRecord? = null) {
+    None,
+    Add_Record,
+    Update_Record
 }
