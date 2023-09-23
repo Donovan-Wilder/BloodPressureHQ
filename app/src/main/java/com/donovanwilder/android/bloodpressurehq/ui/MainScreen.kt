@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -40,16 +42,23 @@ import com.github.mikephil.charting.charts.LineChart
 @Preview
 @Composable
 fun BloodPressureHqApp() {
-    MainScreen()
+    MainScreen({})
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(viewModel: BpRecordsViewModel = viewModel()) {
+fun MainScreen(changeToSettings:()->Unit, viewModel: BpRecordsViewModel = viewModel()) {
     var dialogState by rememberSaveable { mutableStateOf(CurrentDialog.None) }
     var updateBpRecord: BpRecord? = null
     Scaffold(
-        topBar = { CenterAlignedTopAppBar(title = { Text("BloodPressure HQ") }) },
+        topBar = { CenterAlignedTopAppBar(title = { Text("BloodPressure HQ") }, actions = {
+            IconButton(onClick = changeToSettings) {
+                Icon(
+                    imageVector = Icons.Filled.Settings,
+                    contentDescription = "Settings"
+                )
+            }
+        }) },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { dialogState = CurrentDialog.Add_Record },
