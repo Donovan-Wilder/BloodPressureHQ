@@ -1,35 +1,35 @@
 package com.donovanwilder.android.bloodpressurehq
 
-import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.result.registerForActivityResult
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.donovanwilder.android.bloodpressurehq.tools.CsvTools
-import com.donovanwilder.android.bloodpressurehq.ui.BloodPressureHqApp
 import com.donovanwilder.android.bloodpressurehq.ui.BpRecordsViewModel
 import com.donovanwilder.android.bloodpressurehq.ui.MainScreen
 import com.donovanwilder.android.bloodpressurehq.ui.SettingsScreen
 import com.donovanwilder.android.bloodpressurehq.ui.theme.BloodPressureHQTheme
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.launch
 import java.io.BufferedReader
 import java.io.FileNotFoundException
+import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStreamReader
+import java.io.OutputStreamWriter
 
 class MainActivity : ComponentActivity() {
 
@@ -47,7 +47,7 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     val viewModel: BpRecordsViewModel = viewModel()
 
-                    val activityResultsLauncher =
+                    val importCsvLauncher =
                         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                             val uri = result.data!!.data!!
                             val stringBuilder = StringBuilder()
@@ -72,6 +72,26 @@ class MainActivity : ComponentActivity() {
                                 viewModel.addRecords(record)
                             }
                         }
+                    val toast = Toast.makeText(LocalContext.current,"Records Added", Toast.LENGTH_SHORT)
+                    val exportCsvLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                        val uri = result.data!!.data!!
+                        lifecycleScope.launch {
+                            try {
+                                val parcelFileDescriptor =
+                                    contentResolver.openFileDescriptor(uri, "w")
+                                val fos = FileOutputStream(parcelFileDescriptor!!.fileDescriptor)
+                                val bpRecordCsvString =
+                                    CsvTools.createCsvString(viewModel.getAllRecords().first())
+                                val writer = OutputStreamWriter(fos)
+                                writer.write(bpRecordCsvString)
+                                writer.flush()
+                                writer.close()
+                            } catch (e: IOException) {
+                                e.printStackTrace()
+                            }
+                        }
+                        toast.show()
+                    }
 
 
                     NavHost(navController = navController, startDestination = "home_screen") {
@@ -84,7 +104,10 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("settings_screen") {
                             SettingsScreen(onImportCsv = {
-                                activityResultsLauncher.launch(it)
+                                importCsvLauncher.launch(it)
+                            },
+                            onExportCsv = {
+                                exportCsvLauncher.launch(it)
                             })
                         }
                     }

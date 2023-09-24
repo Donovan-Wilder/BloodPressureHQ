@@ -25,12 +25,12 @@ import androidx.compose.ui.unit.dp
 @Preview
 @Composable
 fun SettingsScreenPreview() {
-    SettingsScreen({})
+    SettingsScreen({},{})
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(onImportCsv:(Intent)->Unit) {
+fun SettingsScreen(onImportCsv:(Intent)->Unit,onExportCsv:(Intent)->Unit) {
 
     val toast = Toast.makeText(LocalContext.current, "File Imported", Toast.LENGTH_SHORT)
     Scaffold(topBar = { CenterAlignedTopAppBar(title = { Text(text = "Settings") }) }) {
@@ -52,6 +52,25 @@ fun SettingsScreen(onImportCsv:(Intent)->Unit) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(text = "Import from File")
+            }
+            Row(
+                Modifier
+                    .border(1.dp, Color.Gray)
+                    .clickable {
+                        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                            addCategory(Intent.CATEGORY_OPENABLE)
+                            type = "text/plain"
+                            putExtra(Intent.EXTRA_TITLE, "BpRecords")
+                        }
+
+                        onExportCsv(intent)
+                    }
+                    .height(48.dp)
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = "Export to File")
             }
         }
 
