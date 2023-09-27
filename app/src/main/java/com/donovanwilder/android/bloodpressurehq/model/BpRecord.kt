@@ -26,5 +26,10 @@ data class BpRecord(
 
     companion object {
         const val TABLE_NAME = "bp_record"
+        const val sysMaxValue = 400
+        const val sysMinValue = 50
+        const val diaMaxValue = 400
+        const val diaMinValue = 20
+        const val pulseMaxValue = 500
     }
 }
