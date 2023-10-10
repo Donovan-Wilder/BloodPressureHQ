@@ -9,8 +9,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,15 +29,26 @@ import androidx.compose.ui.unit.dp
 @Preview
 @Composable
 fun SettingsScreenPreview() {
-    SettingsScreen({},{})
+    SettingsScreen({}, {},{},{})
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(onImportCsv:(Intent)->Unit,onExportCsv:(Intent)->Unit) {
+fun SettingsScreen(onImportCsv: (Intent) -> Unit, onExportCsv: (Intent) -> Unit, onReportIssue: (Intent)->Unit, onBackPressed: ()->Unit) {
 
     val toast = Toast.makeText(LocalContext.current, "File Imported", Toast.LENGTH_SHORT)
-    Scaffold(topBar = { CenterAlignedTopAppBar(title = { Text(text = "Settings") }) }) {
+    Scaffold(topBar = {
+        CenterAlignedTopAppBar(
+            title = { Text(text = "Settings") },
+            navigationIcon = {
+                IconButton(onClick = { onBackPressed }) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = "Back"
+                    )
+                }
+            })
+    }) {
         Column(modifier = Modifier.padding(it)) {
             Row(
                 Modifier
@@ -71,6 +86,25 @@ fun SettingsScreen(onImportCsv:(Intent)->Unit,onExportCsv:(Intent)->Unit) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(text = "Export to File")
+            }
+            Row(
+                Modifier
+                    .border(1.dp, Color.Gray)
+                    .clickable {
+                        val intent = Intent(Intent.ACTION_SEND).apply {
+                            putExtra(Intent.EXTRA_EMAIL, "info@donovanwilder.com")
+                            type = "text/plain"
+                            putExtra(Intent.EXTRA_TITLE, "BpRecords")
+                        }
+                        onReportIssue(intent)
+
+                    }
+                    .height(48.dp)
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = "Report Issue")
             }
         }
 

@@ -72,27 +72,32 @@ class MainActivity : ComponentActivity() {
                                 viewModel.addRecords(record)
                             }
                         }
-                    val toast = Toast.makeText(LocalContext.current,"Records Added", Toast.LENGTH_SHORT)
-                    val exportCsvLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-                        val uri = result.data!!.data!!
-                        lifecycleScope.launch {
-                            try {
-                                val parcelFileDescriptor =
-                                    contentResolver.openFileDescriptor(uri, "w")
-                                val fos = FileOutputStream(parcelFileDescriptor!!.fileDescriptor)
-                                val bpRecordCsvString =
-                                    CsvTools.createCsvString(viewModel.getAllRecords().first())
-                                val writer = OutputStreamWriter(fos)
-                                writer.write(bpRecordCsvString)
-                                writer.flush()
-                                writer.close()
-                            } catch (e: IOException) {
-                                e.printStackTrace()
+                    val toast =
+                        Toast.makeText(LocalContext.current, "Records Added", Toast.LENGTH_SHORT)
+                    val exportCsvLauncher =
+                        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                            val uri = result.data!!.data!!
+                            lifecycleScope.launch {
+                                try {
+                                    val parcelFileDescriptor =
+                                        contentResolver.openFileDescriptor(uri, "w")
+                                    val fos =
+                                        FileOutputStream(parcelFileDescriptor!!.fileDescriptor)
+                                    val bpRecordCsvString =
+                                        CsvTools.createCsvString(viewModel.getAllRecords().first())
+                                    val writer = OutputStreamWriter(fos)
+                                    writer.write(bpRecordCsvString)
+                                    writer.flush()
+                                    writer.close()
+                                } catch (e: IOException) {
+                                    e.printStackTrace()
+                                }
                             }
+                            toast.show()
                         }
-                        toast.show()
-                    }
-
+                    val emailReportLauncher =
+                        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                        }
 
                     NavHost(navController = navController, startDestination = "home_screen") {
                         composable("home_screen") {
@@ -103,12 +108,19 @@ class MainActivity : ComponentActivity() {
                             })
                         }
                         composable("settings_screen") {
-                            SettingsScreen(onImportCsv = {
-                                importCsvLauncher.launch(it)
-                            },
-                            onExportCsv = {
-                                exportCsvLauncher.launch(it)
-                            })
+                            SettingsScreen(
+                                onImportCsv = {
+                                    importCsvLauncher.launch(it)
+                                },
+                                onExportCsv = {
+                                    exportCsvLauncher.launch(it)
+                                },
+                                onReportIssue = {
+                                   emailReportLauncher.launch(it)
+                                },
+                                onBackPressed = {
+                                    navController.popBackStack()
+                                })
                         }
                     }
                 }
