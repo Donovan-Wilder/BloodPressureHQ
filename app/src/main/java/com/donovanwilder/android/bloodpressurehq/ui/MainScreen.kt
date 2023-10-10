@@ -1,6 +1,6 @@
 package com.donovanwilder.android.bloodpressurehq.ui
 
-import android.annotation.SuppressLint
+import android.graphics.Color
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,21 +34,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleCoroutineScope
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.donovanwilder.android.bloodpressurehq.R
 import com.donovanwilder.android.bloodpressurehq.model.BpRecord
 import com.donovanwilder.android.bloodpressurehq.tools.DateTools
 import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.ValueFormatter
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -59,40 +54,42 @@ fun BloodPressureHqApp() {
     MainScreen({})
 }
 
-@SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(changeToSettings: () -> Unit, viewModel: BpRecordsViewModel = viewModel()) {
+fun MainScreen(changeToSettings:()->Unit, viewModel: BpRecordsViewModel = viewModel()) {
+
     var dialogState by rememberSaveable { mutableStateOf(CurrentDialog.None) }
     var updateBpRecord: BpRecord? = null
-
-
     Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(title = { Text("BloodPressure HQ") }, actions = {
-                IconButton(onClick = changeToSettings) {
-                    Icon(
-                        imageVector = Icons.Filled.Settings,
-                        contentDescription = "Settings"
-                    )
-                }
-            })
-        },
+        topBar = { CenterAlignedTopAppBar(title = { Text("BloodPressure HQ") }, actions = {
+            IconButton(onClick = changeToSettings) {
+                Icon(
+                    imageVector = Icons.Filled.Settings,
+                    contentDescription = "Settings"
+                )
+            }
+        }) },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { dialogState = CurrentDialog.Add_Record },
-                content = {})
+                content = {
+                    Icon(painter = painterResource(id = R.drawable.ic_add_record), contentDescription = null )
+                })
         }
     ) {
         Box {
 
             Column(modifier = Modifier.padding(it)) {
 
-                StatisticsScreen(modifier = Modifier.weight(1f))
-                RecordsScreen(updateRecord = {
+                StatisticsScreen(modifier = Modifier.weight(1f),viewModel)
+                RecordsScreen(
+                    viewModel = viewModel,
+                    updateRecord = {
                     updateBpRecord = it
                     dialogState = CurrentDialog.Update_Record
-                }, modifier = Modifier.weight(1f))
+                }, modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 16.dp, end = 16.dp))
             }
             when (dialogState) {
                 CurrentDialog.Add_Record -> {
@@ -156,7 +153,7 @@ fun MainScreen(changeToSettings: () -> Unit, viewModel: BpRecordsViewModel = vie
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StatisticsScreen(modifier: Modifier = Modifier, viewModel: BpRecordsViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
+fun StatisticsScreen(modifier: Modifier = Modifier,viewModel: BpRecordsViewModel) {
 
 
     val dailyAverages = viewModel.bpRecordDailyAvergeList.collectAsState()
@@ -169,14 +166,12 @@ fun StatisticsScreen(modifier: Modifier = Modifier, viewModel: BpRecordsViewMode
             modifier = Modifier.padding(it),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
             AndroidView(modifier = Modifier.fillMaxSize(), factory = {
-
-
                 LineChart(it)
 
             }){
                 val xAxis = it.xAxis
+                xAxis.position = XAxis.XAxisPosition.BOTTOM
                 xAxis.valueFormatter = XAxisValueFormmater()
                 val sysData = arrayListOf<Entry>()
                 val diaData = arrayListOf<Entry>()
@@ -194,12 +189,19 @@ fun StatisticsScreen(modifier: Modifier = Modifier, viewModel: BpRecordsViewMode
                     }
                     }
 
-                val sysLineDataSet = LineDataSet(sysData,"sys")
-                val diaLineDataSet = LineDataSet(diaData, "dia")
-                val pulseLineDataSet = LineDataSet(pulseData, "pulse")
+                val sysLineDataSet = LineDataSet(sysData,"sys").apply {
+                    color = Color.BLUE
+                }
+                val diaLineDataSet = LineDataSet(diaData, "dia").apply {
+                    color = Color.GREEN
+                }
+                val pulseLineDataSet = LineDataSet(pulseData, "pulse").apply {
+                    color = Color.LTGRAY
+                }
 
                 val dataSet = listOf(sysLineDataSet,diaLineDataSet, pulseLineDataSet)
-                it
+                it.description = null
+                it.axisRight.isEnabled = false
                 it.data = LineData(dataSet)
                 it.invalidate()
             }
@@ -220,12 +222,12 @@ fun StatisticsScreen(modifier: Modifier = Modifier, viewModel: BpRecordsViewMode
 fun RecordsScreen(
     modifier: Modifier = Modifier,
     updateRecord: (bpRecord: BpRecord) -> Unit,
-    bpRecordsViewModel: BpRecordsViewModel = viewModel(),
+    viewModel: BpRecordsViewModel,
 
     ) {
 
 
-    val recordList by bpRecordsViewModel.bpRecordsList.collectAsState()
+    val recordList by viewModel.bpRecordsList.collectAsState()
 
 
 
@@ -236,7 +238,7 @@ fun RecordsScreen(
         },
     ) {
         LazyColumn(contentPadding = it, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            items(recordList) {
+            items(recordList.reversed()) {
                 RecordItem(
                     it,
                     onClick = { updateRecord(it) }
