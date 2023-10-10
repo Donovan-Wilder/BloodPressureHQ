@@ -62,7 +62,9 @@ fun MainScreen(changeToSettings:()->Unit, viewModel: BpRecordsViewModel = viewMo
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { dialogState = CurrentDialog.Add_Record },
-                content = {})
+                content = {
+                    Icon(painter = painterResource(id = R.drawable.ic_add_record), contentDescription = null )
+                })
         }
     ) {
         Box {
@@ -73,7 +75,7 @@ fun MainScreen(changeToSettings:()->Unit, viewModel: BpRecordsViewModel = viewMo
                 RecordsScreen(updateRecord = {
                     updateBpRecord = it
                     dialogState = CurrentDialog.Update_Record
-                }, modifier = Modifier.weight(1f))
+                }, modifier = Modifier.weight(1f).padding(start = 16.dp, end = 16.dp))
             }
             when (dialogState) {
                 CurrentDialog.Add_Record -> {
