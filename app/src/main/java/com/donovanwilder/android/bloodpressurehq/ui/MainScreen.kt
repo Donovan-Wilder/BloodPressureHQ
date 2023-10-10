@@ -148,21 +148,6 @@ fun StatisticsScreen(modifier: Modifier = Modifier) {
             modifier = Modifier.padding(it),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = { /*TODO*/ }) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_left_arrow),
-                        contentDescription = null
-                    )
-                }
-                Text(text = "This Week")
-                IconButton(onClick = { /*TODO*/ }) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_right_arrow),
-                        contentDescription = null
-                    )
-                }
-            }
             AndroidView(modifier = Modifier.fillMaxWidth(), factory = {
                 LineChart(it)
             })
