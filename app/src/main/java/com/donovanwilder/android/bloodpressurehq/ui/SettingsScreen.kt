@@ -41,7 +41,7 @@ fun SettingsScreen(onImportCsv: (Intent) -> Unit, onExportCsv: (Intent) -> Unit,
         CenterAlignedTopAppBar(
             title = { Text(text = "Settings") },
             navigationIcon = {
-                IconButton(onClick = { onBackPressed }) {
+                IconButton(onClick = { onBackPressed.invoke() }) {
                     Icon(
                         imageVector = Icons.Filled.ArrowBack,
                         contentDescription = "Back"

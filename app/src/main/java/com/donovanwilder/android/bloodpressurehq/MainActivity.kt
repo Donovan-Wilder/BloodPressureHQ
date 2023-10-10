@@ -31,6 +31,7 @@ import java.io.IOException
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 
+private const val TAG = "MainActivity"
 class MainActivity : ComponentActivity() {
 
 
@@ -119,7 +120,7 @@ class MainActivity : ComponentActivity() {
                                    emailReportLauncher.launch(it)
                                 },
                                 onBackPressed = {
-                                    navController.popBackStack()
+                                   navController.popBackStack()
                                 })
                         }
                     }
