@@ -1,9 +1,11 @@
 package com.donovanwilder.android.bloodpressurehq.ui
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -32,11 +34,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleCoroutineScope
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.donovanwilder.android.bloodpressurehq.R
 import com.donovanwilder.android.bloodpressurehq.model.BpRecord
 import com.donovanwilder.android.bloodpressurehq.tools.DateTools
 import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.formatter.ValueFormatter
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
 
 
 @Preview
@@ -45,26 +59,29 @@ fun BloodPressureHqApp() {
     MainScreen({})
 }
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(changeToSettings:()->Unit, viewModel: BpRecordsViewModel = viewModel()) {
+fun MainScreen(changeToSettings: () -> Unit, viewModel: BpRecordsViewModel = viewModel()) {
     var dialogState by rememberSaveable { mutableStateOf(CurrentDialog.None) }
     var updateBpRecord: BpRecord? = null
+
+
     Scaffold(
-        topBar = { CenterAlignedTopAppBar(title = { Text("BloodPressure HQ") }, actions = {
-            IconButton(onClick = changeToSettings) {
-                Icon(
-                    imageVector = Icons.Filled.Settings,
-                    contentDescription = "Settings"
-                )
-            }
-        }) },
+        topBar = {
+            CenterAlignedTopAppBar(title = { Text("BloodPressure HQ") }, actions = {
+                IconButton(onClick = changeToSettings) {
+                    Icon(
+                        imageVector = Icons.Filled.Settings,
+                        contentDescription = "Settings"
+                    )
+                }
+            })
+        },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { dialogState = CurrentDialog.Add_Record },
-                content = {
-                    Icon(painter = painterResource(id = R.drawable.ic_add_record), contentDescription = null )
-                })
+                content = {})
         }
     ) {
         Box {
@@ -75,7 +92,7 @@ fun MainScreen(changeToSettings:()->Unit, viewModel: BpRecordsViewModel = viewMo
                 RecordsScreen(updateRecord = {
                     updateBpRecord = it
                     dialogState = CurrentDialog.Update_Record
-                }, modifier = Modifier.weight(1f).padding(start = 16.dp, end = 16.dp))
+                }, modifier = Modifier.weight(1f))
             }
             when (dialogState) {
                 CurrentDialog.Add_Record -> {
@@ -139,8 +156,10 @@ fun MainScreen(changeToSettings:()->Unit, viewModel: BpRecordsViewModel = viewMo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StatisticsScreen(modifier: Modifier = Modifier) {
+fun StatisticsScreen(modifier: Modifier = Modifier, viewModel: BpRecordsViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
 
+
+    val dailyAverages = viewModel.bpRecordDailyAvergeList.collectAsState()
     Scaffold(modifier = modifier, topBar = {
         CenterAlignedTopAppBar(title = { Text("Stats") })
     }) {
@@ -150,13 +169,51 @@ fun StatisticsScreen(modifier: Modifier = Modifier) {
             modifier = Modifier.padding(it),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            AndroidView(modifier = Modifier.fillMaxWidth(), factory = {
+
+            AndroidView(modifier = Modifier.fillMaxSize(), factory = {
+
+
                 LineChart(it)
-            })
+
+            }){
+                val xAxis = it.xAxis
+                xAxis.valueFormatter = XAxisValueFormmater()
+                val sysData = arrayListOf<Entry>()
+                val diaData = arrayListOf<Entry>()
+                val pulseData = arrayListOf<Entry>()
+                dailyAverages.value.toList().reversed().forEach { record ->
+                    if(record.sys!=0) {
+                        sysData.add(Entry(record.dateAdded.time.toFloat(), record.sys.toFloat()))
+                        diaData.add(Entry(record.dateAdded.time.toFloat(), record.dia.toFloat()))
+                        pulseData.add(
+                            Entry(
+                                record.dateAdded.time.toFloat(),
+                                record.pulse.toFloat()
+                            )
+                        )
+                    }
+                    }
+
+                val sysLineDataSet = LineDataSet(sysData,"sys")
+                val diaLineDataSet = LineDataSet(diaData, "dia")
+                val pulseLineDataSet = LineDataSet(pulseData, "pulse")
+
+                val dataSet = listOf(sysLineDataSet,diaLineDataSet, pulseLineDataSet)
+                it
+                it.data = LineData(dataSet)
+                it.invalidate()
+            }
         }
     }
 }
-
+ private class XAxisValueFormmater: ValueFormatter(){
+    override fun getFormattedValue(value: Float): String {
+        val date = Date(value.toLong())
+        val dateFormatter = SimpleDateFormat("MM/dd")
+        val display = dateFormatter.format(date)
+        return display
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -179,7 +236,7 @@ fun RecordsScreen(
         },
     ) {
         LazyColumn(contentPadding = it, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            items(recordList.reversed()) {
+            items(recordList) {
                 RecordItem(
                     it,
                     onClick = { updateRecord(it) }

@@ -1,4 +1,4 @@
-package com.donovanwilder.android.bloodpressurehq.data
+package com.donovanwilder.android.bloodpressurehq
 
 import android.content.Context
 import androidx.room.Room
@@ -11,9 +11,10 @@ class BpRecordRepository private constructor(private val context: Context){
         BpRecordDatabase.DATABASE_NAME).build()
     var lastBpRecordList: List<BpRecord>?=null
 
-    fun getRecordRange(fromDate:Date, toDate:Date) = database.bpRecordDao().getFromDate(fromDate,toDate)
+    suspend fun getAvgFromDateRange(fromDate:Date, toDate:Date) = database.bpRecordDao().getAvgFromDateRange( fromDate,toDate)
     suspend fun addRecord(vararg bpRecord: BpRecord) = database.bpRecordDao().insertAll(*bpRecord)
     fun getAllRecords()= database.bpRecordDao().getAll()
+    suspend fun getEarliestDate() = database.bpRecordDao().getEarliestDate()
     suspend fun updateRecord(id:Int, sysValue: Int, diaValue:Int, pulseValue:Int,dateAdded:Date) = database.bpRecordDao().update(id,sysValue,diaValue,pulseValue,dateAdded)
     suspend fun deleteRecord(bpRecord: BpRecord)=database.bpRecordDao().delete(bpRecord)
     fun getLocale(): Locale =context.resources.configuration.locales.get(0)
@@ -24,6 +25,6 @@ class BpRecordRepository private constructor(private val context: Context){
                 instance = BpRecordRepository(context)
             }
         }
-        fun getInstance() = instance?: throw Exception("BpRecordRepository has not been initialized.")
+        fun getInstance() = instance ?: throw Exception("BpRecordRepository has not been initialized.")
     }
 }

@@ -54,6 +54,8 @@ android {
 }
 
 dependencies {
+
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.4.0")
     implementation("androidx.compose.ui:ui-android:1.5.1")
     //Navigation
     val nav_version = "2.7.3"
