@@ -177,7 +177,7 @@ fun RecordsScreen(
         },
     ) {
         LazyColumn(contentPadding = it, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            items(recordList) {
+            items(recordList.reversed()) {
                 RecordItem(
                     it,
                     onClick = { updateRecord(it) }
