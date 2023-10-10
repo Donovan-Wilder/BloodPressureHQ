@@ -30,42 +30,48 @@ class BpRecordsViewModel : ViewModel() {
         started = SharingStarted.WhileSubscribed(5000L),
         initialValue = emptyList<BpRecord>()
     )
-    fun getDailyRecordAverageList()= flow {
-        val outputList = arrayListOf<BpRecord>()
-        val calendar = Calendar.getInstance()
-        var toDate = calendar.time
-        calendar.apply {
-            set(Calendar.MINUTE, calendar.getActualMinimum(Calendar.MINUTE))
-            set(Calendar.HOUR_OF_DAY, calendar.getActualMinimum(Calendar.HOUR_OF_DAY))
-            set(Calendar.SECOND, calendar.getActualMinimum(Calendar.SECOND))
-            set(Calendar.MILLISECOND, calendar.getActualMinimum(Calendar.MILLISECOND))
-        }
-        var fromDate = calendar.time
 
-        val earliestDate =repository.getEarliestDate()
-        while (fromDate.after(earliestDate)) {
-            val record = repository.getAvgFromDateRange(fromDate, toDate)
-            outputList.add(record)
-
-            calendar.add(Calendar.DAY_OF_MONTH, -1)
+    fun getDailyRecordAverageList() = flow {
+        bpRecordsList.collect {
+            val outputList = arrayListOf<BpRecord>()
+            val calendar = Calendar.getInstance()
+            var toDate = calendar.time
             calendar.apply {
                 set(Calendar.MINUTE, calendar.getActualMinimum(Calendar.MINUTE))
                 set(Calendar.HOUR_OF_DAY, calendar.getActualMinimum(Calendar.HOUR_OF_DAY))
                 set(Calendar.SECOND, calendar.getActualMinimum(Calendar.SECOND))
                 set(Calendar.MILLISECOND, calendar.getActualMinimum(Calendar.MILLISECOND))
             }
-            fromDate = calendar.time
-            calendar.apply {
-                set(Calendar.MINUTE, calendar.getActualMaximum(Calendar.MINUTE))
-                set(Calendar.HOUR_OF_DAY, calendar.getActualMaximum(Calendar.HOUR_OF_DAY))
-                set(Calendar.SECOND, calendar.getActualMaximum(Calendar.SECOND))
-                set(Calendar.MILLISECOND, calendar.getActualMaximum(Calendar.MILLISECOND))
-            }
-            toDate = calendar.time
-        }
+            var fromDate = calendar.time
 
-        emit (outputList)
+            val earliestDate = repository.getEarliestDate()
+            while (fromDate.after(earliestDate)) {
+
+                val record = repository.getAvgFromDateRange(fromDate, toDate)
+                outputList.add(record)
+
+                calendar.add(Calendar.DAY_OF_MONTH, -1)
+                calendar.apply {
+                    set(Calendar.MINUTE, calendar.getActualMinimum(Calendar.MINUTE))
+                    set(Calendar.HOUR_OF_DAY, calendar.getActualMinimum(Calendar.HOUR_OF_DAY))
+                    set(Calendar.SECOND, calendar.getActualMinimum(Calendar.SECOND))
+                    set(Calendar.MILLISECOND, calendar.getActualMinimum(Calendar.MILLISECOND))
+                }
+                fromDate = calendar.time
+                calendar.apply {
+                    set(Calendar.MINUTE, calendar.getActualMaximum(Calendar.MINUTE))
+                    set(Calendar.HOUR_OF_DAY, calendar.getActualMaximum(Calendar.HOUR_OF_DAY))
+                    set(Calendar.SECOND, calendar.getActualMaximum(Calendar.SECOND))
+                    set(Calendar.MILLISECOND, calendar.getActualMaximum(Calendar.MILLISECOND))
+                }
+                toDate = calendar.time
+
+            }
+            emit(outputList)
+        }
     }
+
+
     suspend fun getWeeklyRecordAverageList(): List<BpRecord> {
         val outputList = arrayListOf<BpRecord>()
         val calendar = Calendar.getInstance()
@@ -79,7 +85,7 @@ class BpRecordsViewModel : ViewModel() {
         calendar.add(Calendar.DAY_OF_MONTH, -7)
         var fromDate = calendar.time
 
-        val earliestDate =repository.getEarliestDate()
+        val earliestDate = repository.getEarliestDate()
         while (fromDate.after(earliestDate)) {
             val record = repository.getAvgFromDateRange(fromDate, toDate)
             outputList.add(record)
@@ -106,6 +112,7 @@ class BpRecordsViewModel : ViewModel() {
 
         return outputList
     }
+
     suspend fun getMonthlyRecordAverageList(): List<BpRecord> {
         val outputList = arrayListOf<BpRecord>()
         val calendar = Calendar.getInstance()
@@ -119,7 +126,7 @@ class BpRecordsViewModel : ViewModel() {
         }
         var fromDate = calendar.time
 
-        val earliestDate =repository.getEarliestDate()
+        val earliestDate = repository.getEarliestDate()
         while (fromDate.after(earliestDate)) {
             val record = repository.getAvgFromDateRange(fromDate, toDate)
             outputList.add(record)
@@ -146,6 +153,7 @@ class BpRecordsViewModel : ViewModel() {
 
         return outputList
     }
+
     suspend fun getYearlyRecordAverageList(): List<BpRecord> {
         val outputList = arrayListOf<BpRecord>()
         val calendar = Calendar.getInstance()
@@ -160,7 +168,7 @@ class BpRecordsViewModel : ViewModel() {
         calendar.add(Calendar.MONTH, -1)
         var fromDate = calendar.time
 
-        val earliestDate =repository.getEarliestDate()
+        val earliestDate = repository.getEarliestDate()
         while (fromDate.after(earliestDate)) {
             val record = repository.getAvgFromDateRange(fromDate, toDate)
             outputList.add(record)
@@ -187,6 +195,7 @@ class BpRecordsViewModel : ViewModel() {
 
         return outputList
     }
+
     fun getAllRecords(): Flow<List<BpRecord>> {
 
         return repository.getAllRecords()
