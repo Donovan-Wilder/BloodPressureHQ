@@ -28,6 +28,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -282,9 +283,10 @@ fun RecordItem(record: BpRecord, onClick: () -> Unit, modifier: Modifier = Modif
                 .padding(8.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
+            val locale = LocalContext.current.resources.configuration.locales[0]
             Column {
-                val dateString = DateTools.getDateFormatter().format(record.dateAdded)
-                val timeString = DateTools.getTimeFormatter().format(record.dateAdded)
+                val dateString = DateTools.getDateFormatter(locale).format(record.dateAdded)
+                val timeString = DateTools.getTimeFormatter(locale).format(record.dateAdded)
                 Text(text = dateString)
                 Text(text = timeString)
             }
