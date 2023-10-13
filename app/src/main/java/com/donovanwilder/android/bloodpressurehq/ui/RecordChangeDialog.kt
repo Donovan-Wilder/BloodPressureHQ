@@ -167,23 +167,23 @@ fun ChangeRecordDialog(
                 .width(IntrinsicSize.Max), verticalArrangement = Arrangement.Center
         ) {
             Text(text = title)
-
+            val locale = LocalContext.current.resources.configuration.locales[0]
             if (canChangeDate) {
                 Row {
                     Button(onClick = {
                         datePickerDialog.show()
                     }) {
-                        Text(DateTools.getDateFormatter().format(currentDate))
+                        Text(DateTools.getDateFormatter(locale).format(currentDate))
                     }
                     Spacer(Modifier.width(8.dp))
                     Button(onClick = {
                         timePickerDialog.show()
                     }) {
-                        Text(DateTools.getTimeFormatter().format(currentDate))
+                        Text(DateTools.getTimeFormatter(locale).format(currentDate))
                     }
                 }
             } else {
-                Text(text = DateTools.getDateFormatter().format(currentDate))
+                Text(text = DateTools.getDateFormatter(locale).format(currentDate))
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(text = "Sys", modifier = Modifier.weight(1f))
