@@ -46,6 +46,7 @@ import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.ValueFormatter
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 
 
 @Preview
@@ -101,7 +102,10 @@ fun MainScreen(changeToSettings: () -> Unit, viewModel: BpRecordsViewModel = vie
                 CurrentDialog.Add_Record -> {
                     Dialog(
                         onDismissRequest = { dialogState = CurrentDialog.None },
-                        properties = DialogProperties(true, true),
+                        properties = DialogProperties(
+                            dismissOnBackPress = true,
+                            dismissOnClickOutside = true
+                        ),
                         content = {
                             AddRecordDialog(
                                 onAddButtonClicked = {
@@ -115,7 +119,10 @@ fun MainScreen(changeToSettings: () -> Unit, viewModel: BpRecordsViewModel = vie
 
                 CurrentDialog.Update_Record -> {
                     Dialog(onDismissRequest = { dialogState = CurrentDialog.None },
-                        properties = DialogProperties(true, true),
+                        properties = DialogProperties(
+                            dismissOnBackPress = true,
+                            dismissOnClickOutside = true
+                        ),
                         content = {
                             UpdateRecordDialog(
                                 bpRecord = updateBpRecord!!,
@@ -134,7 +141,10 @@ fun MainScreen(changeToSettings: () -> Unit, viewModel: BpRecordsViewModel = vie
                 CurrentDialog.Delete_Record -> {
                     Dialog(
                         onDismissRequest = { dialogState = CurrentDialog.Update_Record },
-                        properties = DialogProperties(false, false),
+                        properties = DialogProperties(
+                            dismissOnBackPress = false,
+                            dismissOnClickOutside = false
+                        ),
                     ) {
                         ConfirmationDialog(
                             onConfirmation = {
@@ -172,19 +182,19 @@ fun StatisticsScreen(modifier: Modifier = Modifier, viewModel: BpRecordsViewMode
             modifier = Modifier.padding(it),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            AndroidView(modifier = Modifier.fillMaxSize(), factory = {
-                LineChart(it)
+            AndroidView(modifier = Modifier.fillMaxSize(), factory = {context->
+                LineChart(context)
 
             }) {
-
+                val locale = it.context.resources.configuration.locales
                 val xAxis = it.xAxis
                 xAxis.position = XAxis.XAxisPosition.BOTTOM
-                xAxis.valueFormatter = if(recordList.value.size >0) XAxisValueFormmater(recordList.value.get(0).dateAdded.time) else null
+                xAxis.valueFormatter = if(recordList.value.size >0) XAxisValueFormatter(recordList.value[0].dateAdded.time, locale[0]) else null
                 val sysData = arrayListOf<Entry>()
                 val diaData = arrayListOf<Entry>()
                 val pulseData = arrayListOf<Entry>()
                 recordList.value.toList().forEach { record ->
-                    if (record.sys != 0) { // Todo: Change>> This implementation is sloppy allong with the valueFormatter get rid of the subtraction
+                    if (record.sys != 0) { // Todo: Change>> This implementation is sloppy along with the valueFormatter get rid of the subtraction
                         sysData.add(Entry((record.dateAdded.time - recordList.value.first().dateAdded.time ).toFloat(), record.sys.toFloat()))
                         diaData.add(Entry((record.dateAdded.time - recordList.value.first().dateAdded.time ).toFloat(), record.dia.toFloat()))
                         pulseData.add(
@@ -218,12 +228,11 @@ fun StatisticsScreen(modifier: Modifier = Modifier, viewModel: BpRecordsViewMode
     }
 }
 
-private class XAxisValueFormmater(val timeOffset: Long) : ValueFormatter() {
+private class XAxisValueFormatter(val timeOffset: Long, val locale: Locale) : ValueFormatter() {
     override fun getFormattedValue(value: Float): String {
-        val date = Date(value.toLong()+timeOffset)
-        val dateFormatter = SimpleDateFormat("MM/dd")
-        val display = dateFormatter.format(date)
-        return display
+        val date = Date(value.toLong() + timeOffset)
+        val dateFormatter = SimpleDateFormat("MM/dd",locale )
+        return dateFormatter.format(date)
     }
 }
 
@@ -264,7 +273,7 @@ fun RecordsScreen(
 @Composable
 fun RecordItem(record: BpRecord, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Card(
-        modifier = Modifier,
+        modifier = modifier,
         onClick = onClick
     ) {
         Row(
@@ -295,7 +304,7 @@ fun RecordItem(record: BpRecord, onClick: () -> Unit, modifier: Modifier = Modif
     }
 }
 
-enum class CurrentDialog() {
+enum class CurrentDialog {
     None,
     Add_Record,
     Update_Record,
