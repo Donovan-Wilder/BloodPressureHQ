@@ -1,6 +1,6 @@
 package com.donovanwilder.android.bloodpressurehq
 
-import com.donovanwilder.android.bloodpressurehq.data.fake.BpRecordDummyData
+import com.donovanwilder.android.bloodpressurehq.fake.BpRecordDummyData
 import com.donovanwilder.android.bloodpressurehq.model.BpRecord
 import com.donovanwilder.android.bloodpressurehq.tools.DataSetGenerator
 import com.donovanwilder.android.bloodpressurehq.tools.TimeFrame

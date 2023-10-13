@@ -1,6 +1,6 @@
 package com.donovanwilder.android.bloodpressurehq
 
-import com.donovanwilder.android.bloodpressurehq.data.fake.BpRecordDummyData
+import com.donovanwilder.android.bloodpressurehq.fake.BpRecordDummyData
 import org.junit.Assert.*
 import org.junit.Test
 import java.util.Calendar
