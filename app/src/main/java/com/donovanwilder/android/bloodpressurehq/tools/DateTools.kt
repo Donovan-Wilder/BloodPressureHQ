@@ -1,12 +1,12 @@
 package com.donovanwilder.android.bloodpressurehq.tools
 
 import java.text.SimpleDateFormat
-import java.util.logging.SimpleFormatter
+import java.util.Locale
 
 class DateTools {
     companion object {
-        fun getDateFormatter() = SimpleDateFormat("MM/dd/yyy")
-        fun getTimeFormatter() = SimpleDateFormat("hh:mm a")
+        fun getDateFormatter(locale: Locale) = SimpleDateFormat("MM/dd/yyy", locale)
+        fun getTimeFormatter(locale: Locale) = SimpleDateFormat("hh:mm a", locale)
 
     }
 }
