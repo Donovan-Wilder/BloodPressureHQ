@@ -57,23 +57,27 @@ fun ConfirmationDialogPreview() {
 }
 
 @Composable
-fun ConfirmationDialog(modifier: Modifier = Modifier, onConfirmation: ()->Unit,onNegation:() ->Unit) {
+fun ConfirmationDialog(
+    modifier: Modifier = Modifier,
+    onConfirmation: () -> Unit,
+    onNegation: () -> Unit
+) {
 
-        Card {
-            Column (Modifier.padding(16.dp)){
-                Text(text = "Are you sure you want to delete this record?")
-                Spacer(Modifier.height(16.dp))
-                Row {
-                    Button(onClick = onConfirmation) {
-                        Text(text = "Yes")
-                    }
-                    Spacer(Modifier.width(16.dp))
-                    Button(onClick = onNegation) {
-                        Text(text = "No")
-                    }
+    Card {
+        Column(Modifier.padding(16.dp)) {
+            Text(text = "Are you sure you want to delete this record?")
+            Spacer(Modifier.height(16.dp))
+            Row {
+                Button(onClick = onConfirmation) {
+                    Text(text = "Yes")
+                }
+                Spacer(Modifier.width(16.dp))
+                Button(onClick = onNegation) {
+                    Text(text = "No")
                 }
             }
         }
+    }
 }
 
 @Composable
@@ -131,7 +135,7 @@ fun ChangeRecordDialog(
 
     val datePickerDialog = DatePickerDialog(
         LocalContext.current,
-        DatePickerDialog.OnDateSetListener { datePicker, year, month, day ->
+        { _, year, month, day ->
             currentDate = calendar.apply {
                 set(Calendar.YEAR, year)
                 set(Calendar.MONTH, month)
@@ -144,7 +148,7 @@ fun ChangeRecordDialog(
     )
     val timePickerDialog = TimePickerDialog(
         LocalContext.current,
-        TimePickerDialog.OnTimeSetListener { timePicker, hour, min ->
+        { _, hour, min ->
             currentDate = calendar.apply {
                 set(Calendar.HOUR, hour)
                 set(Calendar.MINUTE, min)
@@ -212,7 +216,7 @@ fun ChangeRecordDialog(
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
-            Row() {
+            Row {
                 Button(
                     onClick = {
                         val record = BpRecord(
@@ -234,7 +238,8 @@ fun ChangeRecordDialog(
                 }
                 if (canChangeDate) {
                     Spacer(modifier = Modifier.width(16.dp))
-                    TextButton(onClick =
+                    TextButton(
+                        onClick =
                         onDeleteButtonClicked
                     ) {
                         Text(text = "Delete")

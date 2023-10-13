@@ -7,9 +7,8 @@ import com.donovanwilder.android.bloodpressurehq.model.BpRecord
 import java.util.*
 
 class BpRecordRepository private constructor(private val context: Context){
-    private val database = Room.databaseBuilder(context,BpRecordDatabase::class.java,
+    private val database = Room.databaseBuilder(this.context,BpRecordDatabase::class.java,
         BpRecordDatabase.DATABASE_NAME).build()
-    var lastBpRecordList: List<BpRecord>?=null
 
     suspend fun getAvgFromDateRange(fromDate:Date, toDate:Date) = database.bpRecordDao().getAvgFromDateRange( fromDate,toDate)
     suspend fun addRecord(vararg bpRecord: BpRecord) = database.bpRecordDao().insertAll(*bpRecord)
@@ -17,7 +16,6 @@ class BpRecordRepository private constructor(private val context: Context){
     suspend fun getEarliestDate() = database.bpRecordDao().getEarliestDate()
     suspend fun updateRecord(id:Int, sysValue: Int, diaValue:Int, pulseValue:Int,dateAdded:Date) = database.bpRecordDao().update(id,sysValue,diaValue,pulseValue,dateAdded)
     suspend fun deleteRecord(bpRecord: BpRecord)=database.bpRecordDao().delete(bpRecord)
-    fun getLocale(): Locale =context.resources.configuration.locales.get(0)
     companion object{
         private var instance: BpRecordRepository? = null
         fun initialize(context:Context){

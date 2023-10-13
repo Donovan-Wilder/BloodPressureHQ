@@ -22,7 +22,6 @@ import com.donovanwilder.android.bloodpressurehq.ui.MainScreen
 import com.donovanwilder.android.bloodpressurehq.ui.SettingsScreen
 import com.donovanwilder.android.bloodpressurehq.ui.theme.BloodPressureHQTheme
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.launch
 import java.io.BufferedReader
 import java.io.FileNotFoundException
@@ -39,7 +38,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            BloodPressureHQTheme() {
+            BloodPressureHQTheme {
 
                 // A surface container using the 'background' color from the theme
                 Surface(
@@ -91,6 +90,7 @@ class MainActivity : ComponentActivity() {
                                     writer.write(bpRecordCsvString)
                                     writer.flush()
                                     writer.close()
+                                    parcelFileDescriptor.close()
                                 } catch (e: IOException) {
                                     e.printStackTrace()
                                 }
@@ -98,9 +98,7 @@ class MainActivity : ComponentActivity() {
                             toast.show()
                         }
                     val emailReportLauncher =
-                        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-                        }
-
+                        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()){}
                     NavHost(navController = navController, startDestination = "home_screen") {
                         composable("home_screen") {
                             MainScreen(changeToSettings = {
