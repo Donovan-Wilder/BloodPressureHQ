@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.donovanwilder.android.bloodpressurehq.model.BpRecord
 import com.donovanwilder.android.bloodpressurehq.BpRecordRepository
+import com.github.mikephil.charting.charts.LineChart
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -70,7 +71,14 @@ class BpRecordsViewModel : ViewModel() {
             emit(outputList)
         }
     }
+    private var chart: LineChart? = null
+    fun setChart(chart: LineChart){
+        this.chart = chart
+    }
 
+    fun updateChart(){
+        checkNotNull(chart).notifyDataSetChanged()
+    }
 
     suspend fun getWeeklyRecordAverageList(): List<BpRecord> {
         val outputList = arrayListOf<BpRecord>()

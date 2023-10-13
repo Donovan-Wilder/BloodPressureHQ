@@ -56,24 +56,29 @@ fun BloodPressureHqApp() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(changeToSettings:()->Unit, viewModel: BpRecordsViewModel = viewModel()) {
+fun MainScreen(changeToSettings: () -> Unit, viewModel: BpRecordsViewModel = viewModel()) {
 
     var dialogState by rememberSaveable { mutableStateOf(CurrentDialog.None) }
     var updateBpRecord: BpRecord? = null
     Scaffold(
-        topBar = { CenterAlignedTopAppBar(title = { Text("BloodPressure HQ") }, actions = {
-            IconButton(onClick = changeToSettings) {
-                Icon(
-                    imageVector = Icons.Filled.Settings,
-                    contentDescription = "Settings"
-                )
-            }
-        }) },
+        topBar = {
+            CenterAlignedTopAppBar(title = { Text("BloodPressure HQ") }, actions = {
+                IconButton(onClick = changeToSettings) {
+                    Icon(
+                        imageVector = Icons.Filled.Settings,
+                        contentDescription = "Settings"
+                    )
+                }
+            })
+        },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { dialogState = CurrentDialog.Add_Record },
                 content = {
-                    Icon(painter = painterResource(id = R.drawable.ic_add_record), contentDescription = null )
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_add_record),
+                        contentDescription = null
+                    )
                 })
         }
     ) {
@@ -81,15 +86,16 @@ fun MainScreen(changeToSettings:()->Unit, viewModel: BpRecordsViewModel = viewMo
 
             Column(modifier = Modifier.padding(it)) {
 
-                StatisticsScreen(modifier = Modifier.weight(1f),viewModel)
+                StatisticsScreen(modifier = Modifier.weight(1f), viewModel)
                 RecordsScreen(
                     viewModel = viewModel,
                     updateRecord = {
-                    updateBpRecord = it
-                    dialogState = CurrentDialog.Update_Record
-                }, modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 16.dp, end = 16.dp))
+                        updateBpRecord = it
+                        dialogState = CurrentDialog.Update_Record
+                    }, modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 16.dp, end = 16.dp)
+                )
             }
             when (dialogState) {
                 CurrentDialog.Add_Record -> {
@@ -153,10 +159,10 @@ fun MainScreen(changeToSettings:()->Unit, viewModel: BpRecordsViewModel = viewMo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StatisticsScreen(modifier: Modifier = Modifier,viewModel: BpRecordsViewModel) {
+fun StatisticsScreen(modifier: Modifier = Modifier, viewModel: BpRecordsViewModel) {
 
 
-    val dailyAverages = viewModel.bpRecordDailyAvergeList.collectAsState()
+    val recordList = viewModel.bpRecordsList.collectAsState()
     Scaffold(modifier = modifier, topBar = {
         CenterAlignedTopAppBar(title = { Text("Stats") })
     }) {
@@ -169,48 +175,52 @@ fun StatisticsScreen(modifier: Modifier = Modifier,viewModel: BpRecordsViewModel
             AndroidView(modifier = Modifier.fillMaxSize(), factory = {
                 LineChart(it)
 
-            }){
+            }) {
+
                 val xAxis = it.xAxis
                 xAxis.position = XAxis.XAxisPosition.BOTTOM
-                xAxis.valueFormatter = XAxisValueFormmater()
+                xAxis.valueFormatter = if(recordList.value.size >0) XAxisValueFormmater(recordList.value.get(0).dateAdded.time) else null
                 val sysData = arrayListOf<Entry>()
                 val diaData = arrayListOf<Entry>()
                 val pulseData = arrayListOf<Entry>()
-                dailyAverages.value.toList().reversed().forEach { record ->
-                    if(record.sys!=0) {
-                        sysData.add(Entry(record.dateAdded.time.toFloat(), record.sys.toFloat()))
-                        diaData.add(Entry(record.dateAdded.time.toFloat(), record.dia.toFloat()))
+                recordList.value.toList().forEach { record ->
+                    if (record.sys != 0) { // Todo: Change>> This implementation is sloppy allong with the valueFormatter get rid of the subtraction
+                        sysData.add(Entry((record.dateAdded.time - recordList.value.first().dateAdded.time ).toFloat(), record.sys.toFloat()))
+                        diaData.add(Entry((record.dateAdded.time - recordList.value.first().dateAdded.time ).toFloat(), record.dia.toFloat()))
                         pulseData.add(
                             Entry(
-                                record.dateAdded.time.toFloat(),
+                                (record.dateAdded.time - recordList.value.first().dateAdded.time  ).toFloat(),
                                 record.pulse.toFloat()
                             )
                         )
                     }
-                    }
+                }
 
-                val sysLineDataSet = LineDataSet(sysData,"sys").apply {
+                val sysLineDataSet = LineDataSet(sysData, "sys").apply {
                     color = Color.BLUE
                 }
                 val diaLineDataSet = LineDataSet(diaData, "dia").apply {
                     color = Color.GREEN
                 }
                 val pulseLineDataSet = LineDataSet(pulseData, "pulse").apply {
-                    color = Color.LTGRAY
+                    color = Color.MAGENTA
                 }
 
-                val dataSet = listOf(sysLineDataSet,diaLineDataSet, pulseLineDataSet)
+                val dataSet = listOf(sysLineDataSet, diaLineDataSet, pulseLineDataSet)
                 it.description = null
                 it.axisRight.isEnabled = false
                 it.data = LineData(dataSet)
+
                 it.invalidate()
+
             }
         }
     }
 }
- private class XAxisValueFormmater: ValueFormatter(){
+
+private class XAxisValueFormmater(val timeOffset: Long) : ValueFormatter() {
     override fun getFormattedValue(value: Float): String {
-        val date = Date(value.toLong())
+        val date = Date(value.toLong()+timeOffset)
         val dateFormatter = SimpleDateFormat("MM/dd")
         val display = dateFormatter.format(date)
         return display
