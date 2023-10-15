@@ -1,12 +1,11 @@
 # BloodPressure HQ
-![Blood Pressure HQ feature image](https://donovanwilder.com/wp-content/uploads/2023/10/featured_image.png)
-BloodPresure HQ is a blood pressure tracking applications with plans to be your onestop app to help those get their blood pressure under control. 
-Keep a record of your readings, add previously taken records, or export your records to send to your health care professional. Stay in control and on the path to a healthier you.
+<img src = "https://donovanwilder.com/wp-content/uploads/2023/10/featured_image.png" width= "80%" height="80%">
+BloodPresure HQ is a blood pressure tracking applications with plans to be the one stop app to help those with hypertension get their blood pressure under control. This app keeps a record of your readings, add previously taken records to your collection, and export your records so that you can send them to your health care professional. Stay in control and on the path to a healthier you.
 
 Follow the development at [BloodPressure HQ](https://donovanwilder.com/bloodpressurehq)
 
-# Features
-Curretnly the following functions are implemented:
+## Features
+Currently the following functions are implemented:
 - Create, Read, Update, and Delete records from presistent storage on your device
 - Export your records to a CSV document
 - Line Chart to aid with visualization of trends
@@ -15,13 +14,21 @@ Curretnly the following functions are implemented:
 Future Development:
 - Sycronization with Bluetooth monitors
 - Reminder Notifications
-- UI/UX Redesign for 
-![](https://donovanwilder.com/wp-content/uploads/2023/10/Screenshot_20231013_010144_BloodPressureHQ.jpg) ![](https://donovanwilder.com/wp-content/uploads/2023/10/Screenshot_20231013_010152_BloodPressureHQ.jpg) ![](https://donovanwilder.com/wp-content/uploads/2023/10/Screenshot_20231013_011912_BloodPressureHQ.jpg)
+- UI/UX Redesign 
+  
+<img src = "https://donovanwilder.com/wp-content/uploads/2023/10/Screenshot_20231013_010144_BloodPressureHQ.jpg" width="25%" height="25%">   <img src = "https://donovanwilder.com/wp-content/uploads/2023/10/Screenshot_20231013_010152_BloodPressureHQ.jpg" width="25%" height="25%">   <img src = "https://donovanwilder.com/wp-content/uploads/2023/10/Screenshot_20231013_011912_BloodPressureHQ.jpg" width="25%" height="25%">
 
-# Developed by 
+## Developed by 
 - Donovan Wilder
 
-# License
+## Technologies 
+* Kotlin
+* Jetpack Compose
+* [MpAndroid Charts](https://github.com/PhilJay/MPAndroidChart)
+* Coroutines
+* MVVM Architecture
+  
+## License
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
