@@ -1,27 +1,27 @@
 # BloodPressure HQ
-
+![Blood Pressure HQ feature image](https://donovanwilder.com/wp-content/uploads/2023/10/featured_image.png)
 BloodPresure HQ is a blood pressure tracking applications with plans to be your onestop app to help those get their blood pressure under control. 
 Keep a record of your readings, add previously taken records, or export your records to send to your health care professional. Stay in control and on the path to a healthier you.
 
-Follow the develpment at https://donovanwilder.com/bloodpressurehq
+Follow the development at [BloodPressure HQ](https://donovanwilder.com/bloodpressurehq)
 
-#Features
+# Features
 Curretnly the following functions are implemented:
-Create, Read, Update, and Delete records from presistent storage on your device
-Export your records to a CSV document
-Line Chart to aid with visualization of trends
-Easily report issues and request features
+- Create, Read, Update, and Delete records from presistent storage on your device
+- Export your records to a CSV document
+- Line Chart to aid with visualization of trends
+- Easily report issues and request features
 
 Future Development:
-Sycronization with Bluetooth monitors
-Reminder Notifications
-UI/UX Redesign for 
+- Sycronization with Bluetooth monitors
+- Reminder Notifications
+- UI/UX Redesign for 
+![](https://donovanwilder.com/wp-content/uploads/2023/10/Screenshot_20231013_010144_BloodPressureHQ.jpg) ![](https://donovanwilder.com/wp-content/uploads/2023/10/Screenshot_20231013_010152_BloodPressureHQ.jpg) ![](https://donovanwilder.com/wp-content/uploads/2023/10/Screenshot_20231013_011912_BloodPressureHQ.jpg)
 
+# Developed by 
+- Donovan Wilder
 
-#Developed by 
-Donovan Wilder
-
-#License
+# License
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
