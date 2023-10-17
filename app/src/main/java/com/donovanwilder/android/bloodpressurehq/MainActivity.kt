@@ -50,6 +50,12 @@ class MainActivity : ComponentActivity() {
 
                     val importCsvLauncher =
                         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                            if(result.data == null){
+                                return@rememberLauncherForActivityResult
+                                if(result.data!!.data == null){
+                                    return@rememberLauncherForActivityResult
+                                }
+                            }
                             val uri = result.data!!.data!!
                             val stringBuilder = StringBuilder()
                             try {
@@ -77,6 +83,12 @@ class MainActivity : ComponentActivity() {
                         Toast.makeText(LocalContext.current, "Records Added", Toast.LENGTH_SHORT)
                     val exportCsvLauncher =
                         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                            if(result.data == null){
+                                return@rememberLauncherForActivityResult
+                                if(result.data!!.data == null){
+                                    return@rememberLauncherForActivityResult
+                                }
+                            }
                             val uri = result.data!!.data!!
                             lifecycleScope.launch {
                                 try {
