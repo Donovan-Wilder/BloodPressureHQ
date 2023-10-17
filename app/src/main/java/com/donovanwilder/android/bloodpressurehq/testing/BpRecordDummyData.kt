@@ -1,4 +1,4 @@
-package com.donovanwilder.android.bloodpressurehq.fake
+package com.donovanwilder.android.bloodpressurehq.testing
 
 import com.donovanwilder.android.bloodpressurehq.model.BpRecord
 import java.io.File
