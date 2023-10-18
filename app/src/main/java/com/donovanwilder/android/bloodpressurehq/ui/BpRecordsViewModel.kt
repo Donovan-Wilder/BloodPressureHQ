@@ -33,7 +33,7 @@ class BpRecordsViewModel : ViewModel() {
 
     fun updateRecord(id: Int, sysValue: Int, diaValue: Int, pulseValue: Int, dateAdded: Date) {
         viewModelScope.launch {
-            repository.updateRecord(id, sysValue, diaValue, pulseValue, dateAdded)
+            repository.updateRecord(id, dateAdded, sysValue, diaValue, pulseValue)
         }
     }
 
