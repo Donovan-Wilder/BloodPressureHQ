@@ -30,7 +30,7 @@ import java.util.GregorianCalendar
  */
 @RunWith(AndroidJUnit4::class)
 @SmallTest
-class DatabaseTest {
+class BpRecordDaoTest {
     private lateinit var recordDao: BpRecordDao
     private lateinit var db: BpRecordDatabase
 
