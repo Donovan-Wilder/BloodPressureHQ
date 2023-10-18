@@ -7,6 +7,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.donovanwilder.android.bloodpressurehq.database.BpRecordDao
 import com.donovanwilder.android.bloodpressurehq.database.BpRecordDatabase
+import com.donovanwilder.android.bloodpressurehq.model.BpRecord
 import com.donovanwilder.android.bloodpressurehq.testing.BpRecordDummyData
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -19,6 +20,7 @@ import org.junit.Assert.*
 import org.junit.Before
 import java.io.IOException
 import java.util.Calendar
+import java.util.Date
 import java.util.GregorianCalendar
 
 /**
@@ -103,5 +105,27 @@ class DatabaseTest {
         }
 
         assertTrue(isSorted)
+    }
+    @Test
+    fun Should_UpdateRecord()= runTest{
+        val recordData = arrayOf(
+            BpRecord(0, Date(0),120, 70,60),
+            BpRecord(0, Date(0),120, 70,60),
+            BpRecord(0, Date(0),120, 70,60)
+        )
+        recordDao.insertAll(*recordData)
+
+        val(sys,dia, pulse) = arrayOf(135,85,45)
+        val date = Date(4)
+        recordDao.update(2,sys, dia, pulse, date)
+
+        val result = recordDao.getBpRecord(2)
+
+        assertEquals(sys,result.sys)
+        assertEquals(dia,result.dia)
+        assertEquals(pulse, result.pulse)
+        assertEquals(date, result.dateAdded)
+
+
     }
 }
