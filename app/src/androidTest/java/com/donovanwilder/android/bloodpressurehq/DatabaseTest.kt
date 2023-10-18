@@ -65,16 +65,17 @@ class DatabaseTest {
         calender.add(Calendar.DAY_OF_MONTH, -5)
         val fromDate = calender.time
         val recordList = BpRecordDummyData.generateRecordList(15, fromDate, toDate)
-        for(record in recordList){
+        for (record in recordList) {
             recordDao.insertAll(record)
         }
 
         val result = recordDao.getAll().first()
 
-        assertEquals(15,result.size)
+        assertEquals(15, result.size)
     }
+
     @Test
-    fun Should_ReturnListOfRecordsInAscendingOrder()= runTest{
+    fun Should_ReturnListOfRecordsInAscendingOrder() = runTest {
         val calender = GregorianCalendar.getInstance().apply {
             set(Calendar.YEAR, 2023)
             set(Calendar.MONTH, 9)
@@ -89,16 +90,16 @@ class DatabaseTest {
         val fromDate = calender.time
         val recordList = BpRecordDummyData.generateRecordList(15, fromDate, toDate)
         recordList.random()
-        for(record in recordList){
+        for (record in recordList) {
             recordDao.insertAll(record)
         }
 
         val result = recordDao.getAll().first()
 
-       var isSorted = false
+        var isSorted = false
         var lastRecord = result[0]
-        for( i in 1 until result.size){
-            if(lastRecord.dateAdded.time<= result[i].dateAdded.time){
+        for (i in 1 until result.size) {
+            if (lastRecord.dateAdded.time <= result[i].dateAdded.time) {
                 isSorted = true
             }
             lastRecord = result[i]
@@ -106,23 +107,24 @@ class DatabaseTest {
 
         assertTrue(isSorted)
     }
+
     @Test
-    fun Should_UpdateRecord()= runTest{
+    fun Should_UpdateRecord() = runTest {
         val recordData = arrayOf(
-            BpRecord(0, Date(0),120, 70,60),
-            BpRecord(0, Date(0),120, 70,60),
-            BpRecord(0, Date(0),120, 70,60)
+            BpRecord(0, Date(0), 120, 70, 60),
+            BpRecord(0, Date(0), 120, 70, 60),
+            BpRecord(0, Date(0), 120, 70, 60)
         )
         recordDao.insertAll(*recordData)
 
-        val(sys,dia, pulse) = arrayOf(135,85,45)
+        val (sys, dia, pulse) = arrayOf(135, 85, 45)
         val date = Date(4)
-        recordDao.update(2,sys, dia, pulse, date)
+        recordDao.update(2, date, sys, dia, pulse)
 
         val result = recordDao.getBpRecord(2)
 
-        assertEquals(sys,result.sys)
-        assertEquals(dia,result.dia)
+        assertEquals(sys, result.sys)
+        assertEquals(dia, result.dia)
         assertEquals(pulse, result.pulse)
         assertEquals(date, result.dateAdded)
 
