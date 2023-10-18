@@ -130,4 +130,27 @@ class BpRecordDaoTest {
 
 
     }
+
+    @Test
+    fun Should_DeleteRecord()= runTest{
+
+        val deletedRecord = BpRecord(0, Date(1), 121, 71, 61)
+        val recordData = arrayOf(
+            BpRecord(0, Date(0), 120, 70, 60),
+            deletedRecord,
+            BpRecord(0, Date(3), 123, 73, 63)
+        )
+
+        recordDao.insertAll(*recordData)
+
+        recordDao.delete(BpRecord(1,Date(0),0,0,0))
+
+
+        val result = recordDao.getAll().first()
+
+        assertEquals(2, result.size)
+        assertNotEquals(deletedRecord, result[1])
+
+
+    }
 }
