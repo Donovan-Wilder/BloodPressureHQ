@@ -12,8 +12,8 @@ import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.collections.List
 
-class BpRecordsViewModel : ViewModel() {
-    private val repository = BpRecordRepository.getInstance()
+class BpRecordsViewModel(private val repository: BpRecordRepository = BpRecordRepository.getInstance()) :
+    ViewModel() {
 
     val bpRecordsList: StateFlow<List<BpRecord>> = repository.getAllRecords()
         .stateIn(
