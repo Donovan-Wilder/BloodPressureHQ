@@ -56,6 +56,8 @@ android {
 
 dependencies {
 
+    testImplementation("io.mockk:mockk:1.9.3")
+    testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.4.0")
     implementation("androidx.compose.ui:ui-android:1.5.1")
     //Navigation
