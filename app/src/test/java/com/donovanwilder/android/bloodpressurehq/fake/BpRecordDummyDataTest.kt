@@ -3,9 +3,11 @@ package com.donovanwilder.android.bloodpressurehq.fake
 import com.donovanwilder.android.bloodpressurehq.testing.BpRecordDummyData
 import org.junit.Assert.*
 import org.junit.Test
+import java.io.File
 import java.util.Calendar
 import java.util.Date
 import java.util.GregorianCalendar
+import java.util.Scanner
 
 class BpRecordDummyDataTest {
     @Test
@@ -72,4 +74,68 @@ class BpRecordDummyDataTest {
 
         assertEquals(expected, result.size)
     }
+
+    @Test
+    fun Should_GenerateAFile() {
+        val calendar = GregorianCalendar.getInstance().apply {
+            set(Calendar.MONTH, 0)
+            set(Calendar.DAY_OF_MONTH, 1)
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        val fromDate = calendar.time
+        calendar.apply {
+            set(Calendar.MONTH, 11)
+            set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH))
+            set(Calendar.HOUR_OF_DAY, calendar.getActualMaximum(Calendar.HOUR_OF_DAY))
+            set(Calendar.MINUTE, calendar.getActualMaximum(Calendar.MINUTE))
+            set(Calendar.MILLISECOND, calendar.getActualMaximum(Calendar.MILLISECOND))
+        }
+        val toDate = calendar.time
+
+        val filename =  "test_${Date().time}"
+        val file = File(filename)
+        BpRecordDummyData.generateFile(1,fromDate,toDate, file)
+
+
+        assertTrue( file.exists())
+        file.delete()
+    }
+    @Test
+    fun Should_ProduceCorrectNumberOfRecords() {
+        val calendar = GregorianCalendar.getInstance().apply {
+            set(Calendar.MONTH, 0)
+            set(Calendar.DAY_OF_MONTH, 1)
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        val fromDate = calendar.time
+        calendar.apply {
+            set(Calendar.MONTH, 11)
+            set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH))
+            set(Calendar.HOUR_OF_DAY, calendar.getActualMaximum(Calendar.HOUR_OF_DAY))
+            set(Calendar.MINUTE, calendar.getActualMaximum(Calendar.MINUTE))
+            set(Calendar.MILLISECOND, calendar.getActualMaximum(Calendar.MILLISECOND))
+        }
+        val toDate = calendar.time
+
+        val filename =  "test_${Date().time}"
+        val file = File(filename)
+        val numberOfRecords = 15
+        BpRecordDummyData.generateFile(numberOfRecords,fromDate,toDate, file)
+
+        val scanner = Scanner(file)
+        var result = 0
+        while( scanner.hasNextLine()){
+            result++
+            scanner.nextLine()
+        }
+
+        val expected = numberOfRecords + 1 // Include  the Csv header line
+        assertEquals(expected, result)
+        file.delete()
+    }
+
 }
