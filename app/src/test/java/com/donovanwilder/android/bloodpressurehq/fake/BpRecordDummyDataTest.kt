@@ -11,7 +11,7 @@ import java.util.Scanner
 
 class BpRecordDummyDataTest {
     @Test
-    fun Should_GenerateCorrectNumberofRecords() {
+    fun Should_GenerateCorrectNumberOfRecords() {
         val calendar = GregorianCalendar.getInstance()
         calendar.clear()
         calendar.set(2023, 0, 20, 0, 0)
@@ -51,7 +51,7 @@ class BpRecordDummyDataTest {
         val data = BpRecordDummyData.getDailyRecordList(Date(), 7, 1)
         var differentDays = 1
         val calendar = GregorianCalendar.getInstance()
-        calendar.time = data.get(0).dateAdded
+        calendar.time = data[0].dateAdded
         calendar.set(Calendar.HOUR_OF_DAY, calendar.getActualMaximum(Calendar.HOUR_OF_DAY))
         calendar.set(Calendar.MINUTE, calendar.getActualMaximum((Calendar.MINUTE)))
 
@@ -68,7 +68,7 @@ class BpRecordDummyDataTest {
     }
 
     @Test
-    fun Should_GenerateMulipleRecords_When_RecordPerDayIsMoreThanOne() {
+    fun Should_GenerateMultipleRecords_When_RecordPerDayIsMoreThanOne() {
         val expected = 21
         val result = BpRecordDummyData.getDailyRecordList(Date(), 7, 3)
 
