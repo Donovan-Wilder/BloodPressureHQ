@@ -7,13 +7,14 @@ import java.util.Date
 import java.util.GregorianCalendar
 import kotlin.random.Random
 
-fun main() {
-    val calendar= GregorianCalendar.getInstance()
-    val toDate = calendar.time
-    calendar.add(Calendar.DAY_OF_MONTH,-7)
-    val fromDate = calendar.time
-    BpRecordDummyData.generateFile(75, fromDate, toDate)
-}
+// For generating files during testing
+//fun main() {
+//    val calendar= GregorianCalendar.getInstance()
+//    val toDate = calendar.time
+//    calendar.add(Calendar.DAY_OF_MONTH,-7)
+//    val fromDate = calendar.time
+//    BpRecordDummyData.generateFile(75, fromDate, toDate)
+//}
 
 class BpRecordDummyData {
     companion object {
@@ -36,15 +37,11 @@ class BpRecordDummyData {
             toDate: Date,
             file: File = File("test.txt")
         ) {
-
-            val file = file
             val writer = file.writer()
 
             writer.write("_id, date_added, sys, dia, pulse\n")
 
-            for (i in 0..numberOfRecords) {
-
-
+            for (i in 0 until numberOfRecords) {
                 val dateAdded = Random(Date().time * i).nextLong(fromDate.time, toDate.time)
                 val sys = Random(Date().time * i).nextInt(88, 170)
                 val dia = Random(Date().time * i).nextInt(60, 90)
