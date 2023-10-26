@@ -8,6 +8,7 @@ import java.util.Calendar
 import java.util.Date
 import java.util.GregorianCalendar
 import java.util.Scanner
+import java.util.regex.Pattern
 
 class BpRecordDummyDataTest {
     @Test
@@ -133,8 +134,57 @@ class BpRecordDummyDataTest {
             scanner.nextLine()
         }
 
+        scanner.close()
         val expected = numberOfRecords + 1 // Include  the Csv header line
         assertEquals(expected, result)
+        file.delete()
+    }
+
+    @Test
+    fun Should_GenerateRecordsWithinFile(){
+        val calendar = GregorianCalendar.getInstance().apply {
+            set(Calendar.MONTH, 0)
+            set(Calendar.DAY_OF_MONTH, 1)
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        val fromDate = calendar.time
+        calendar.apply {
+            set(Calendar.MONTH, 11)
+            set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH))
+            set(Calendar.HOUR_OF_DAY, calendar.getActualMaximum(Calendar.HOUR_OF_DAY))
+            set(Calendar.MINUTE, calendar.getActualMaximum(Calendar.MINUTE))
+            set(Calendar.MILLISECOND, calendar.getActualMaximum(Calendar.MILLISECOND))
+        }
+        val toDate = calendar.time
+
+        val filename =  "test_${Date().time}"
+        val file = File(filename)
+        val numberOfRecords = 250
+        BpRecordDummyData.generateFile(numberOfRecords,fromDate,toDate, file)
+        val regex = "^\\d*,\\s?(\\d*)"
+        val pattern = Pattern.compile(regex)
+        val scanner = Scanner(file)
+        var result = 0
+        while( scanner.hasNextLine()){
+            if (result == 0){
+                result++
+                scanner.nextLine()
+                continue
+            }
+            val line = scanner.nextLine()
+            val matcher = pattern.matcher(line)
+            var date = 0L
+            if(matcher.find()){
+                date = matcher.group(1)?.toLong() ?: 0L
+            }
+            assertTrue(fromDate.time<= date)
+            assertTrue(toDate.time >= date)
+            result++
+        }
+
+        scanner.close()
         file.delete()
     }
 
