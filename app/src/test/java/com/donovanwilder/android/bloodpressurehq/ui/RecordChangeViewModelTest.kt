@@ -1,7 +1,9 @@
 package com.donovanwilder.android.bloodpressurehq.ui
 
+import com.donovanwilder.android.bloodpressurehq.model.BpRecord
 import org.junit.Assert.*
 import org.junit.Test
+import java.util.Date
 
 class RecordChangeViewModelTest {
     @Test
@@ -27,5 +29,18 @@ class RecordChangeViewModelTest {
             val result = viewModel.validateInput(it.toString())
             assertFalse( result)
         }
+    }
+    @Test
+    fun Should_UpdateValues(){
+        val viewModel = RecordChangeViewModel()
+        val record = BpRecord(5, Date(155), 155,66, 44)
+
+        viewModel.updateValues(record)
+
+        assertEquals(record.sys.toString(), viewModel.sys)
+        assertEquals(record.dia.toString(), viewModel.dia)
+        assertEquals(record.pulse.toString(), viewModel.pulse)
+
+
     }
 }
