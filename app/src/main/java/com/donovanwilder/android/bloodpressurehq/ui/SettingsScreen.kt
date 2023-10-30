@@ -20,19 +20,26 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.donovanwilder.android.bloodpressurehq.R
 
 
 @Preview
 @Composable
 fun SettingsScreenPreview() {
-    SettingsScreen({}, {},{},{})
+    SettingsScreen({}, {}, {}, {})
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(onImportCsv: (Intent) -> Unit, onExportCsv: (Intent) -> Unit, onReportIssue: (Intent)->Unit, onBackPressed: ()->Unit) {
+fun SettingsScreen(
+    onImportCsv: (Intent) -> Unit,
+    onExportCsv: (Intent) -> Unit,
+    onReportIssue: (Intent) -> Unit,
+    onBackPressed: () -> Unit
+) {
 
     Scaffold(topBar = {
         CenterAlignedTopAppBar(
@@ -63,7 +70,7 @@ fun SettingsScreen(onImportCsv: (Intent) -> Unit, onExportCsv: (Intent) -> Unit,
                     .padding(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = "Import from File")
+                Text(text = stringResource(R.string.import_from_file))
             }
             Row(
                 Modifier
@@ -82,7 +89,7 @@ fun SettingsScreen(onImportCsv: (Intent) -> Unit, onExportCsv: (Intent) -> Unit,
                     .padding(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = "Export to File")
+                Text(text = stringResource(R.string.export_to_file))
             }
             Row(
                 Modifier
@@ -101,7 +108,7 @@ fun SettingsScreen(onImportCsv: (Intent) -> Unit, onExportCsv: (Intent) -> Unit,
                     .padding(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = "Report Issue")
+                Text(text = stringResource(R.string.report_issue))
             }
         }
 
