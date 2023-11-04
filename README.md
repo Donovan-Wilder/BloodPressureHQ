@@ -22,11 +22,14 @@ Future Development:
 - Donovan Wilder
 
 ## Technologies 
+### Implementation
 * Kotlin
 * Jetpack Compose
 * [MpAndroid Charts](https://github.com/PhilJay/MPAndroidChart)
 * Coroutines
 * MVVM Architecture
+### Testing
+* Firebase Test Labs
   
 ## License
 

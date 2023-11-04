@@ -190,7 +190,11 @@ fun ChangeRecordDialog(
                 Spacer(Modifier.width(8.dp))
                 TextField(
                     value = viewModel.sys,
-                    onValueChange = { viewModel.sys = it },
+                    onValueChange = {
+                        if (viewModel.validateInput(it)) {
+                            viewModel.sys = it
+                        }
+                    },
                     modifier = Modifier.weight(2f),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
@@ -200,7 +204,11 @@ fun ChangeRecordDialog(
                 Spacer(Modifier.width(8.dp))
                 TextField(
                     value = viewModel.dia,
-                    onValueChange = { viewModel.dia = it },
+                    onValueChange = {
+                        if(viewModel.validateInput(it)){
+                            viewModel.dia = it
+                        }
+                                                       },
                     modifier = Modifier.weight(2f),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
@@ -210,7 +218,11 @@ fun ChangeRecordDialog(
                 Spacer(Modifier.width(8.dp))
                 TextField(
                     value = viewModel.pulse,
-                    onValueChange = { viewModel.pulse = it },
+                    onValueChange = {
+                        if(viewModel.validateInput(it)){
+                            viewModel.pulse = it
+                        }
+                                                       },
                     modifier = Modifier.weight(2f),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
@@ -219,6 +231,12 @@ fun ChangeRecordDialog(
             Row {
                 Button(
                     onClick = {
+
+                        if(viewModel.sys.isBlank()||viewModel.dia.isBlank()||viewModel.pulse.isBlank()){
+                            viewModel.sys = "0"
+                            viewModel.dia = "0"
+                            viewModel.pulse = "0"
+                        }
                         val record = BpRecord(
                             id = bpRecord.id,
                             dateAdded = currentDate,

@@ -16,5 +16,20 @@ class RecordChangeViewModel : ViewModel() {
         dia = bpRecord.dia.toString()
         pulse = bpRecord.pulse.toString()
     }
+    fun validateInput(value: String):Boolean {
+        for(character in value){
+            if(!character.isDigit()){
+                return false
+            }
+        }
+        if(value == ""){
+            return true
+        }
+        val valueInt = value.toInt()
+        if(valueInt>500||valueInt<0){
+            return false
+        }
+        return true
+    }
 
 }
